@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sofa Store</title>
+    <style>
+        /* Style for header */
+        .header {
+            background-color: #333;
+            color: #fff;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Style for store heading */
+        .store-heading {
+            margin: 0; /* Remove default margin */
+        }
+
+        /* Style for category list */
+        .category-list {
+            list-style: none; /* Remove bullet points */
+            padding: 0; /* Remove default padding */
+        }
+
+        /* Style for list items */
+        .category-list li {
+            display: inline; /* Display list items inline */
+            margin-right: 10px; /* Add spacing between list items */
+        }
+
+        
+        /* Style for main container */
+        .main-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start; /* Align items to the top */
+            margin: 60px 0; /* Adjusted margin to provide more space */
+        }
+        
+        /* Style for filter container */
+        .filter-container {
+            width: 200px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        
+        /* Style for product container */
+        .product-container {
+            flex: 1;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            position: relative; /* Position relative for absolute positioning of sort dropdown */
+        }
+        
+        /* Style for individual product */
+        .product {
+            width: calc(33.33% - 20px);
+            margin-bottom: 20px;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+        }
+        
+        /* Style for product image */
+        .product img {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        
+        /* Style for product name */
+        .product h3 {
+            margin-top: 10px;
+            font-size: 16px;
+        }
+        
+        /* Style for product price */
+        .product span {
+            display: block;
+            margin-top: 5px;
+            font-weight: bold;
+            color: green;
+        }
+        
+        /* Hover effect */
+        .product:hover {
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Style for sorting dropdown */
+        .sort-dropdown {
+            position: absolute;
+            top: -50px; /* Adjust the distance from the product container */
+            right: 0;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 5px;
+            z-index: 1; /* Ensure it appears above products */
+        }
+
+        /* Style for sorting dropdown select */
+        .sort-dropdown select {
+            padding: 5px;
+            border-radius: 3px;
+        }
+
+        /* Style for sorting buttons */
+        .sort-btn {
+            margin-top: 10px;
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: #291b1b;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <h1 class="store-heading">Sofa Store</h1>
+        <!-- Display all category names -->
+        <div class="category-names">
+            <ul class="category-list">
+                {% for category in categories %}
+                    <li>{{ category.name }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </header>
+
+
+    
+    <!-- Main container -->
+    <div class="main-container">
+        <!-- Filter container -->
+        <div class="filter-container">
+            <h2>Filter</h2>
+            <!-- Add filter options here -->
+            <h3>Category</h3>
+            <!-- Add category filter options here -->
+            <h3>Price</h3>
+            <!-- Add price filter options here -->
+            <!-- Sorting dropdown -->
+            <div class="sort-dropdown">
+                <select id="sortSelect">
+                    <option value="nameAsc">Sort by Name (A-Z)</option>
+                    <option value="nameDesc">Sort by Name (Z-A)</option>
+                    <option value="priceAsc">Sort by Price (Low to High)</option>
+                    <option value="priceDesc">Sort by Price (High to Low)</option>
+                </select>
+            </div>
+        </div>
+        
+        
+        <!-- Product container -->
+        <div class="product-container">
+            <!-- Sorting dropdown -->
+            <div class="sort-dropdown">
+                <select id="sortSelect">
+                    <option value="nameAsc">Sort by Name (A-Z)</option>
+                    <option value="nameDesc">Sort by Name (Z-A)</option>
+                    <option value="priceDesc">Sort by Price (High to Low)</option>
+                    <option value="priceAsc">Sort by Price (Low to High)</option>
+                </select>
+            </div>
+
+            {% for product in products %}
+                <div class="product">
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                    <h3>{{ product.name }}</h3>
+                    <span>${{ product.price }}</span>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        // JavaScript for sorting functionality
+        document.getElementById('sortSelect').addEventListener('change', function() {
+            var sortValue = this.value;
+            if (sortValue === 'nameAsc') {
+                sortProductsByNameAsc();
+            } else if (sortValue === 'nameDesc') {
+                sortProductsByNameDesc();
+            } else if (sortValue === 'priceAsc') {
+                sortProductsByPriceAsc();
+            } else if (sortValue === 'priceDesc') {
+                sortProductsByPriceDesc();
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var sortSelect = document.getElementById('sortSelect');
+            sortSelect.addEventListener('change', function() {
+                var sortValue = this.value;
+                if (sortValue === 'nameAsc') {
+                    sortProductsByNameAsc();
+                } else if (sortValue === 'nameDesc') {
+                    sortProductsByNameDesc();
+                } else if (sortValue === 'priceAsc') {
+                    sortProductsByPriceAsc();
+                } else if (sortValue === 'priceDesc') {
+                    sortProductsByPriceDesc();
+                }
+            });
+        });
+
+        function sortProductsByNameAsc() {
+            var productsContainer = document.querySelector('.product-container');
+            var products = Array.from(productsContainer.children);
+
+            products.sort(function(a, b) {
+                var nameA = a.querySelector('h3').textContent.toLowerCase();
+                var nameB = b.querySelector('h3').textContent.toLowerCase();
+                return nameA.localeCompare(nameB);
+            });
+
+            products.forEach(function(product) {
+                productsContainer.appendChild(product);
+            });
+        }
+
+        function sortProductsByNameDesc() {
+            var productsContainer = document.querySelector('.product-container');
+            var products = Array.from(productsContainer.children);
+
+            products.sort(function(a, b) {
+                var nameA = a.querySelector('h3').textContent.toLowerCase();
+                var nameB = b.querySelector('h3').textContent.toLowerCase();
+                return nameB.localeCompare(nameA);
+            });
+
+            products.forEach(function(product) {
+                productsContainer.appendChild(product);
+            });
+        }
+
+        function sortProductsByPriceAsc() {
+            var productsContainer = document.querySelector('.product-container');
+            var products = Array.from(productsContainer.children);
+
+            products.sort(function(a, b) {
+                var priceA = parseFloat(a.querySelector('span').textContent.substring(1));
+                var priceB = parseFloat(b.querySelector('span').textContent.substring(1));
+                return priceA - priceB;
+            });
+
+            products.forEach(function(product) {
+                productsContainer.appendChild(product);
+            });
+        }
+
+        function sortProductsByPriceDesc() {
+            var productsContainer = document.querySelector('.product-container');
+            var products = Array.from(productsContainer.children);
+
+            products.sort(function(a, b) {
+                var priceA = parseFloat(a.querySelector('span').textContent.substring(1));
+                var priceB = parseFloat(b.querySelector('span').textContent.substring(1));
+                return priceB - priceA;
+            });
+
+            products.forEach(function(product) {
+                productsContainer.appendChild(product);
+            });
+        }
+    </script>
+</body>
+</html>
